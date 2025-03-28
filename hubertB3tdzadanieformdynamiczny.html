@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>form</title>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .email-group { margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+    <h2>Dynamiczny Formularz</h2>
+    <form id="dynamicForm">
+        <label>Imie <input type="text" id="imie" required></label><br>
+        <label>nazwisko <input type="text" id="naz" required></label><br>
+        <label>wiek <input type="number" id="wiek" required></label><br>
+        <div id="emails">
+            <label>mail: <input type="email" name="mail[]" pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$" required>
+                <button type="button" onclick="addEmailField()">+</button>
+            </label>
+        </div>
+        <label>typ
+            <select id="typ" onchange="toggleNipField()">
+                <option value="osoba">Osoba</option>
+                <option value="firma">Firma</option>
+            </select>
+        </label><br>
+        <div id="nip" style="display: none;">
+            <label>NIP: <input type="text" id="nip"></label><br>
+        </div>
+        <button type="button" onclick="saveData()">zapisz</button>
+    </form>
+    <script>
+        let emailList = [];
+        function addEmailField() {
+            let email = document.createElement("div");
+            email.classList.add("email-group");
+            email.innerHTML = `
+                <input type="email" name="mail[]" required>
+                <button type="button" onclick="removeEmailField(this)">-</button>`;
+            document.getElementById("emails").appendChild(email);   }
+        function removeEmailField(button) {
+            button.parentElement.remove();
+            updateEmailList();     }  
+        function updateEmailList() {
+            emailList = Array.from(document.querySelectorAll("input[name='mail[]']")).map(input => input.value);     }
+        function toggleNipField() {
+            let typ = document.getElementById("typ").value;
+            let nip = document.getElementById("nip");
+            nip.style.display = typ === "firma" ? "block" : "none";     }
+        function saveData() {   
+            updateEmailList();   
+            let formData = {
+                imie: document.getElementById("imie").value,
+                naz: document.getElementById("naz").value,
+                wiek: document.getElementById("wiek").value,
+                mejl: emailList,  
+                typ: document.getElementById("typ").value      };
+            if (formData.typ === "firma") {
+                formData.nip = document.getElementById("nip").value;    }
+            console.log(formData);  
+            document.getElementById("dynamicForm").reset();
+            document.getElementById("emails").innerHTML = `
+                <label>Email: <input type="email" name="mail[]" required>
+                <button type="button" onclick="addEmailField()">+</button>
+                </label>`;
+            document.getElementById("nip").style.display = "none";
+        }
+    </script>
+</body>
+</html>
